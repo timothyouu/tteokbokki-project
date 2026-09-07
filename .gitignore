@@ -1,0 +1,16 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Local environment files
+.env
+.env.local
+
+# JavaScript dependencies and build output
+node_modules/
+dist/
+build/
+
+# Editor settings
+.vscode/
+.idea/
