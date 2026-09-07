@@ -17,7 +17,7 @@ Open `http://localhost:5173/` at the buffet or `http://localhost:5173/?view=rest
 
 Hold WASD or the on-screen arrows to walk. Left-drag to look in any direction; right-drag to slide sideways. Furniture and walls block walking. Click objects or aim the center dot and press E. The recipe card provides accessible alternatives to picking ingredients and sauces.
 
-Scoop ingredients from the buffet. Walk around its ends to the tea/water dispensers and sauce bowls, then click to fill a cup or choose a sauce. Drinks add a sip control. Carry at least one ingredient around Table 04 to its chair to sit automatically. Light the burner before stirring. Heat warms the broth gradually, a full pot takes longer, high power makes a stronger boil, and turning off the burner cools it gradually. Once cooked, pick up chopsticks and eat. Stand up to continue exploring or return for ingredients.
+Scoop ingredients from the buffet. Walk around its ends to the tea/water dispensers and sauce bowls, then click to fill a cup or choose a sauce. Click the held cup to sip. Carry at least one ingredient around Table 04 to its chair to sit automatically. Light the burner before stirring. Heat warms the broth gradually, a full pot takes longer, high power makes a stronger boil, and turning off the burner cools it gradually. Once cooked, click the chopsticks on the napkin, then click food to eat. Duplicate action buttons live under Your pot → Optional action buttons. Stand up to continue exploring or return for ingredients.
 
 Kitchen appliances, entrance doors, and other dining tables are environmental scenery. Table 04 is the player's cooking seat. This is a stylized 3D experience, with no NPC service or checkout system.
 
@@ -48,6 +48,6 @@ The carried pot is held close and checked against cached bounds from the rendere
 
 ## Leaving the table for a drink
 
-Stand up leaves the pot on Table 04, turns the burner off, and preserves cooking progress. Walk to the cup rack, click to take a cup, and click a tea or water tap to fill it. Sip from the held cup or its button; three sips empty it, and the tap refills it. Return to the chair to resume your meal and place the drink on the table. To add ingredients, explicitly pick up the pot while standing near the table. The aiming dot appears only while walking, and the carried pot stays below it.
+Stand up leaves the pot on Table 04, turns the burner off, and preserves cooking progress. Walk to the cup rack, click to take a cup, and click a tea or water tap to fill it. Sip from the held cup or the optional button in Your pot; three sips empty it, and the tap refills it. Return to the chair to resume your meal and place the drink on the table. To add ingredients, explicitly pick up the pot while standing near the table. The aiming dot appears only while walking, and the carried pot stays below it.
 
 See `scripts/DRINK_FLOW_CHECKS.md` for the verified full-trip acceptance sequence.

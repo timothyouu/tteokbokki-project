@@ -26,7 +26,7 @@ export function advanceHeat(state:ThermalState,burnerOn:boolean,heat:number,port
  return {temperature,boil,progress};
 }
 export function cookingPrompt(burnerOn:boolean,temperature:number,ready:boolean):string {
- if(ready)return 'Your pot is ready. Pick up the chopsticks.';
+ if(ready)return 'Ready · click the chopsticks on the napkin to eat.';
  if(!burnerOn)return temperature>40?'Burner off · turn the dial on to keep cooking':'Click the burner dial to light it';
  if(temperature<65)return 'Warming up · give the broth a moment';
  if(temperature<90)return 'Heating through · gently stir the broth';
