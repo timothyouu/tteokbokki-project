@@ -51,3 +51,12 @@ The carried pot is held close and checked against cached bounds from the rendere
 Stand up leaves the pot on Table 04, turns the burner off, and preserves cooking progress. Walk to the cup rack, click to take a cup, and click a tea or water tap to fill it. Sip from the held cup or the optional button in Your pot; three sips empty it, and the tap refills it. Return to the chair to resume your meal and place the drink on the table. To add ingredients, explicitly pick up the pot while standing near the table. The aiming dot appears only while walking, and the carried pot stays below it.
 
 See `scripts/DRINK_FLOW_CHECKS.md` for the verified full-trip acceptance sequence.
+
+
+## Mixing and physics
+
+Drag through the broth while the burner is on: the ladle follows the pointer at a bounded speed, so reversing the drag reverses the current. Food pieces have persistent positions, different effective masses, viscous drag, and low-bounce contacts with each other and the pot wall. Motion continues after release and dissipates. The optional Stir button performs one short circular stroke through the same simulation. Stirring never adds cooking progress.
+
+`src/mixing.ts` is a fixed-step (120 Hz), shallow-broth approximation. It models horizontal food contacts and an acceleration-driven, damped liquid surface. Food collision shapes are approximate discs; it does not simulate deformable noodles, full three-dimensional buoyancy, spilling, or real-time cooking chemistry. Cooking remains accelerated. Picking up a hot pot preserves its temperature; adding room-temperature ingredients cools it by relative heat capacity and restarts the meal's cooking progress. Drink surfaces counter-rotate against the cup within its rim.
+
+Run `node --experimental-strip-types scripts/verify-mixing.mjs` for direction, settling, full-pot containment, contact, frame-rate and surface checks. The numerical integration follows the fixed-step and damping principles described in https://box2d.org/documentation/md_simulation.html; no physics dependency is required.

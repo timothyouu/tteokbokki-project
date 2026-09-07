@@ -40,3 +40,9 @@ export function heatDescription(temperature:number,boil:number):string {
  if(temperature>30)return 'Warming';
  return 'Cool broth';
 }
+
+/** Equal-temperature mixing by relative heat capacity; new portions enter at room temperature. */
+export function addColdPortion(state:ThermalState,existingPortions:number):ThermalState {
+ const mass=1+clamp(existingPortions,0,23)/24,addedMass=1/24;
+ return {temperature:(state.temperature*mass+22*addedMass)/(mass+addedMass),boil:state.boil*mass/(mass+addedMass),progress:0};
+}
