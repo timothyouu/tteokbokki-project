@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {advanceHeat,coldPot,cookingPrompt} from '../src/thermal.ts';
+import {advanceHeat,addColdPortion,coldPot,cookingPrompt} from '../src/thermal.ts';
 function run(state,on,heat,portions,seconds,step=.1){for(let elapsed=0;elapsed<seconds-1e-8;elapsed+=step)state=advanceHeat(state,on,heat,portions,Math.min(step,seconds-elapsed));return state;}
 assert.deepEqual(run(coldPot(),false,3,10,10),coldPot());
 const low=run(coldPot(),true,1,8,10),high=run(coldPot(),true,3,8,10),full=run(coldPot(),true,3,24,10);
@@ -24,3 +24,7 @@ assert.doesNotMatch(cookingPrompt(false,95,false),/stir/i);
 assert.match(cookingPrompt(true,80,false),/stir/i);
 assert.match(cookingPrompt(false,90,true),/chopsticks/i);
 console.log('PASS: cold/off stability; hotter burner heats faster; full pot heats slower; boiling temperature capped; high heat gives stronger boiling; power reduction and shutdown cool gradually; step-size stability; state-appropriate directions.');
+
+const hot={temperature:95,boil:.5,progress:80};
+const added=addColdPortion(hot,8);assert.ok(added.temperature<95&&added.temperature>90);assert.equal(added.progress,0);assert.ok(added.boil>0&&added.boil<hot.boil);
+console.log('PASS: cold ingredients lower broth temperature by heat capacity without resetting it to room temperature.');

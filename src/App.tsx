@@ -2,7 +2,7 @@ import {useEffect,useRef,useState} from 'react';
 
 import {createWorld} from './world';
 import {ingredients,stations,emptySelection,totalPortions,sauces,type IngredientId,type Stage} from './data';
-import {advanceHeat,coldPot,cookingPrompt,heatDescription} from './thermal';
+import {advanceHeat,addColdPortion,coldPot,cookingPrompt,heatDescription} from './thermal';
 import './style.css';
 export default function App(){
  const [selection,setSelection]=useState(emptySelection);
@@ -39,7 +39,7 @@ export default function App(){
   if(stage!=='pick')return;if(parked){notify('Your pot is on Table 04. Pick it up before adding ingredients.');return;}
   if(total>=24){notify('Your pot is full. Take it to the table.');return;}
   if(selection[id]>=4){notify('Four portions of this one is plenty. Try something else.');return;}
-  setSelection(s=>({...s,[id]:s[id]+1}));world.current?.scoop(id);
+  setThermal(state=>addColdPortion(state,total));thermalLoad.current=total+1;setSelection(s=>({...s,[id]:s[id]+1}));world.current?.scoop(id);
   notify(`${ingredients.find(i=>i.id===id)!.name} · added`);
  }
  function startTable():void{if(!world.current?.canSit())return;if(parked){setStage(ready?'eat':resumeStage.current);setDrawer(false);notify('Welcome back. Your pot is right where you left it.');return;}if(!total){notify('Pick something from a tray first.');return;}thermalLoad.current=total;setParked(true);setStage('cook');setDrawer(false);notify('Click the burner dial to light it.');}
@@ -56,7 +56,7 @@ export default function App(){
  function sip():void{if(!hasCup||!sips||performance.now()-lastSip.current<700)return;lastSip.current=performance.now();setSips(n=>Math.max(0,n-1));world.current?.sip();notify(sips===1?'Cup empty · refill at the drink station':drink+' · a refreshing sip');}
  function reset():void{setParked(false);setSelection(emptySelection());setStage('pick');setStation(0);setThermal(coldPot());setCooking(false);setBites(0);setDrawer(false);notify('A fresh pot. Make it your own.');}
  action.current=(id)=>{
-  if(id==='pickup-pot'&&stage==='pick'&&parked&&world.current?.nearPot()){setParked(false);setThermal(coldPot());notify('Pot picked up. Add ingredients at the buffet.');return;}
+  if(id==='pickup-pot'&&stage==='pick'&&parked&&world.current?.nearPot()){setParked(false);notify('Pot picked up. Add ingredients at the buffet.');return;}
   if(id==='cup'&&stage==='pick'){setHasCup(true);notify(hasCup?'You already have a cup. Choose a dispenser.':'Cup picked up · choose tea or water');return;}
   if(id==='sip'){sip();return;}
   if(id.startsWith('sauce:')&&stage==='pick'){if(parked){notify('Bring your pot to the sauce bar first.');return;}const index=Number(id.slice(6));if(sauces[index]){setSauce(index);notify(sauces[index].name+' · poured into your pot');}return;}
@@ -71,7 +71,7 @@ export default function App(){
  };
  useEffect(()=>{try{world.current=createWorld(host.current!,id=>action.current(id),setHover,setStation,setZone);}catch(error){console.error(error);setSceneError(true);setDrawer(true);}return()=>world.current?.dispose();},[]);
  useEffect(()=>{world.current?.update(selection,stage,station,sauce,cooking,ready,thermal.temperature,thermal.boil,heat,parked,hasCup,sips,drink);},[selection,stage,station,sauce,cooking,ready,thermal.temperature,thermal.boil,heat,parked,hasCup,sips,drink]);
- useEffect(()=>{if(stage==='pick'&&!parked)return;let previous=performance.now();const timer=setInterval(()=>{const now=performance.now();const seconds=(now-previous)/1000;previous=now;setThermal(state=>advanceHeat(state,cooking,heat,thermalLoad.current,seconds));},100);return()=>clearInterval(timer);},[stage,cooking,heat,parked]);
+ useEffect(()=>{let previous=performance.now();const timer=setInterval(()=>{const now=performance.now();const seconds=(now-previous)/1000;previous=now;setThermal(state=>advanceHeat(state,cooking,heat,thermalLoad.current,seconds));},100);return()=>clearInterval(timer);},[stage,cooking,heat,parked]);
  useEffect(()=>{if(ready){setCooking(false);setHover('');notify(stage==='pick'?'Your pot is ready on Table 04. Return to your chair.':'Your pot is ready. The burner is now off. Pick up the chopsticks.');}},[ready]);
  useEffect(()=>{if(!message)return;const timer=setTimeout(()=>setMessage(''),2600);return()=>clearTimeout(timer);},[message]);
  useEffect(()=>{const onKeyUp=(e:KeyboardEvent)=>world.current?.setMovement(e.key.toLowerCase(),false);const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'){setDrawer(false);setHelp(false);return;}if(help||drawer||(e.target instanceof HTMLElement&&['INPUT','TEXTAREA'].includes(e.target.tagName)))return;
