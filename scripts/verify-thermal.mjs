@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {advanceHeat,addColdPortion,coldPot,cookingPrompt} from '../src/thermal.ts';
+function run(state,on,heat,portions,seconds,step=.1){for(let elapsed=0;elapsed<seconds-1e-8;elapsed+=step)state=advanceHeat(state,on,heat,portions,Math.min(step,seconds-elapsed));return state;}
+assert.deepEqual(run(coldPot(),false,3,10,10),coldPot());
+const low=run(coldPot(),true,1,8,10),high=run(coldPot(),true,3,8,10),full=run(coldPot(),true,3,24,10);
+assert.ok(high.temperature>low.temperature+30);
+assert.ok(high.temperature>full.temperature);
+assert.equal(low.progress,0);
+const boiling={temperature:100,boil:0,progress:0};
+const lowBoil=run(boiling,true,1,8,5),highBoil=run(boiling,true,3,8,5);
+assert.equal(highBoil.temperature,100);
+assert.ok(highBoil.boil>lowBoil.boil*4);
+const lowered=advanceHeat(highBoil,true,1,8,.1);
+assert.ok(lowered.boil<highBoil.boil&&lowered.boil>lowBoil.boil);
+const off=advanceHeat(highBoil,false,3,8,.1);
+assert.ok(off.temperature<100&&off.temperature>99);
+assert.ok(off.boil>0&&off.boil<highBoil.boil);
+const cooled=run(off,false,3,8,20);
+assert.ok(cooled.temperature<off.temperature&&cooled.boil<.01);
+const a=run(coldPot(),true,2,8,10,.05),b=run(coldPot(),true,2,8,10,.2);
+assert.ok(Math.abs(a.temperature-b.temperature)<.01);
+assert.doesNotMatch(cookingPrompt(false,22,false),/stir/i);
+assert.doesNotMatch(cookingPrompt(false,95,false),/stir/i);
+assert.match(cookingPrompt(true,80,false),/stir/i);
+assert.match(cookingPrompt(false,90,true),/chopsticks/i);
+console.log('PASS: cold/off stability; hotter burner heats faster; full pot heats slower; boiling temperature capped; high heat gives stronger boiling; power reduction and shutdown cool gradually; step-size stability; state-appropriate directions.');
+
+const hot={temperature:95,boil:.5,progress:80};
+const added=addColdPortion(hot,8);assert.ok(added.temperature<95&&added.temperature>90);assert.equal(added.progress,0);assert.ok(added.boil>0&&added.boil<hot.boil);
+console.log('PASS: cold ingredients lower broth temperature by heat capacity without resetting it to room temperature.');
